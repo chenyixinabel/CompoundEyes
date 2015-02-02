@@ -25,11 +25,10 @@
 using namespace std;
 using namespace cv;
 
-char conf_file[] = "/home/yixin/workspace/Hist_Nest_parallel/src/Nest/nest.conf";
-int vector_lens[] = {HUESIZE+SATSIZE+VALSIZE, NUM_CCV_COLOR, PATTERNCOUNT, EDGEHISTSIZE, WIDTHHISTSIZE+HEIGHTHISTSIZE\
-, LBPBINCOUNT, OPFLOWHISTSIZE};
-float ranges[] = {0.05, 0.02, 0.05, 0.03, 0.04, 0.05, 0.06};
-int lsh_func_nums[] = {4, 4, 4, 4, 4, 4, 4};
+char conf_file[] = "/home/yixin/workspace/Hist_Nest_parallel_2_1/src/Nest/nest.conf";
+int vector_lens[] = {HUESIZE+SATSIZE+VALSIZE, LBPBINCOUNT};
+float ranges[] = {0.05,0.05};
+int lsh_func_nums[] = {4, 4};
 
 int load_dirs(char*, char*, char** &, unsigned* &, int &);
 int create_feature_tab(NestBuilder* &, int);
@@ -282,7 +281,7 @@ int avg_vecs_comp(char** vid_ptr, int vid_count, float*** &avg_vecs)
 					gen_hists_comp(&hsv_color_dist, imgs, frame_count, hsv_hists);
 					avg_hist_comp(hsv_hists, frame_count, avg_vecs[0][i]);
 				}
-#pragma omp section
+/*#pragma omp section
 				{
 					vector<Mat> cc_hists(frame_count);
 					gen_hists_comp(&color_coherence_dist, imgs, frame_count, cc_hists);
@@ -305,19 +304,20 @@ int avg_vecs_comp(char** vid_ptr, int vid_count, float*** &avg_vecs)
 					vector<Mat> bb_hists(frame_count);
 					gen_hists_comp(&bounding_box_dist, imgs, frame_count, bb_hists);
 					avg_hist_comp(bb_hists, frame_count, avg_vecs[4][i]);
-				}
+				}*/
 #pragma omp section
 				{
 					vector<Mat> tex_hists(frame_count);
 					gen_hists_comp(&texture_dist, imgs, frame_count, tex_hists);
-					avg_hist_comp(tex_hists, frame_count, avg_vecs[5][i]);
+					//avg_hist_comp(tex_hists, frame_count, avg_vecs[5][i]);
+					avg_hist_comp(tex_hists, frame_count, avg_vecs[1][i]);
 				}
-#pragma omp section
+/*#pragma omp section
 				{
 					vector<Mat> of_hists(frame_count-1);
 					optical_flow_hists_comp(&optical_flow_dist, imgs, frame_count, of_hists);
 					avg_hist_comp(of_hists, frame_count-1, avg_vecs[6][i]);
-				}
+				}*/
 			}
 		}
 	}
