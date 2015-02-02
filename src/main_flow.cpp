@@ -294,14 +294,14 @@ int emit_queries(char* query_vid_frame_folder, NestBuilder** nest_builders_ptr, 
 			{
 				(*alg_ann)(nest_builders_ptr[4], query_avg_vecs[4], query_num, classes, CLASSNUM, query_results_all[4], vector_lens[4]);
 			}
-#pragma omp section
+/*#pragma omp section
 			{
 				(*alg_ann)(nest_builders_ptr[5], query_avg_vecs[5], query_num, classes, CLASSNUM, query_results_all[5], vector_lens[5]);
 			}
 #pragma omp section
 			{
 				(*alg_ann)(nest_builders_ptr[6], query_avg_vecs[6], query_num, classes, CLASSNUM, query_results_all[6], vector_lens[6]);
-			}
+			}*/
 		}
 	}
 	gettimeofday(&end, NULL);
