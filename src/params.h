@@ -16,17 +16,8 @@
 #define CLASSNUM 7
 #define FEATURENUM 7
 #define FNLEN 24
+#define MULFACTOR 100
 #define NUMLEN 10
-#define VID_LOOP_THREAD_NUM 2
-#define COM_THREAD_NUM 7
-#define LOOP_THREAD_NUM 3
-#define HSV_LOOP_THREAD_NUM 4
-#define CC_LOOP_THREAD_NUM 20
-#define SP_LOOP_THREAD_NUM 1
-#define EO_LOOP_THREAD_NUM 4
-#define BB_LOOP_THREAD_NUM 1
-#define TEX_LOOP_THREAD_NUM 4
-#define OPT_LOOP_THREAD_NUM 25
 
 extern char *func_name_array[];
 extern char *suffix_array[];

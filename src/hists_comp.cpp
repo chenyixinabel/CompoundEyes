@@ -41,6 +41,52 @@ template <typename _Tp>
 void OLBP(const Mat&, Mat&);
 int optical_flow_dist(Mat, Mat, Mat &);
 
+int print_avg_arr(float* avg_arr, int num)
+{
+	for (int i = 0; i < num; i++){
+		printf("%.4f ", avg_arr[i]);
+	}
+	printf("\n");
+
+	return 0;
+}
+
+int test_procedure(char* dir, int (*hist_calc)(Mat, Mat&), int func_idx)
+{
+	vector<Mat> imgs;
+	int frame_count;
+
+	load_imgs(dir, imgs, frame_count);
+
+	vector<Mat> hists(frame_count);
+	gen_hists_comp(hist_calc, imgs, frame_count, hists);
+	float* avg_arr;
+	avg_hist_comp(hists, frame_count, avg_arr);
+	print_avg_arr(avg_arr, vector_lens[func_idx]);
+
+	free(avg_arr);
+
+	return 0;
+}
+
+int test_optical_flow_alg(char* dir, int (*optical_flow_dist)(Mat, Mat, Mat&))
+{
+	vector<Mat> imgs;
+	int frame_count;
+
+	load_imgs(dir, imgs, frame_count);
+
+	vector<Mat> hists(frame_count-1);
+	optical_flow_hists_comp(optical_flow_dist, imgs, frame_count, hists);
+	float* avg_arr;
+	avg_hist_comp(hists, frame_count-1, avg_arr);
+	print_avg_arr(avg_arr, vector_lens[6]);
+
+	free(avg_arr);
+
+	return 0;
+}
+
 /* Color distribution of a frame in HSV space */
 int hsv_color_dist(Mat img, Mat &hist)
 {
@@ -529,3 +575,16 @@ int optical_flow_dist(Mat prev_img, Mat next_img, Mat &hist)
 
 	return 0;
 }
+
+/*int main(int argc, char** argv)
+{
+	//test_procedure(argv[1], hsv_color_dist, 0);
+	test_procedure(argv[1], color_coherence_dist, 1);
+	//test_procedure(argv[1], spatial_pattern_dist, 2);
+	//test_procedure(argv[1], edge_orient_dist, 3);
+	//test_procedure(argv[1], bounding_box_dist, 4);
+	//test_procedure(argv[1], texture_dist, 5);
+	//test_optical_flow_alg(argv[1], optical_flow_dist);
+
+	return 0;
+}*/

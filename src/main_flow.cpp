@@ -19,7 +19,6 @@
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <libgen.h>
-#include <omp.h>
 #include "params.h"
 #include "pre_proc_aux_funcs.h"
 #include "emit_ques_aux_funcs.h"
@@ -66,11 +65,9 @@ int pre_proc(char* train_vid_frame_folder, char* train_vid_info_file, char* quer
 	unsigned* query_vid_info_ptr;
 	int train_num;
 	float*** train_avg_vecs;
-	int train_dim, query_dim;
+	//int train_dim, query_dim;
 	struct timeval start, end;
 	double comp_train_set, comp_query_set, insertion;
-
-	omp_set_nested(1);
 
 	/// Load directories of videos in the training video set into train_vid_ptr
 	load_dirs(train_vid_frame_folder, train_vid_info_file, train_vid_ptr, train_vid_info_ptr, train_num);
@@ -110,82 +107,6 @@ int pre_proc(char* train_vid_frame_folder, char* train_vid_info_file, char* quer
 			insert_vec(nest_builders_ptr[i], train_avg_vecs[i][j], &train_vid_info_ptr[j]);
 		}
 	}
-/*#pragma omp parallel num_threads(COM_THREAD_NUM)
-	{
-#pragma omp sections
-		{
-#pragma omp section
-			{
-#pragma omp parallel num_threads(LOOP_THREAD_NUM)
-				{
-#pragma omp for schedule(dynamic)
-					for (int j = 0; j < train_num; j++){
-						insert_vec(nest_builders_ptr[0], train_avg_vecs[0][j], &train_vid_info_ptr[j]);
-					}
-				}
-			}
-#pragma omp section
-			{
-#pragma omp parallel num_threads(LOOP_THREAD_NUM)
-				{
-#pragma omp for schedule(dynamic)
-					for (int j = 0; j < train_num; j++){
-						insert_vec(nest_builders_ptr[1], train_avg_vecs[1][j], &train_vid_info_ptr[j]);
-					}
-				}
-			}
-#pragma omp section
-			{
-#pragma omp parallel num_threads(LOOP_THREAD_NUM)
-				{
-#pragma omp for schedule(dynamic)
-					for (int j = 0; j < train_num; j++){
-						insert_vec(nest_builders_ptr[2], train_avg_vecs[2][j], &train_vid_info_ptr[j]);
-					}
-				}
-			}
-#pragma omp section
-			{
-#pragma omp parallel num_threads(LOOP_THREAD_NUM)
-				{
-#pragma omp for schedule(dynamic)
-					for (int j = 0; j < train_num; j++){
-						insert_vec(nest_builders_ptr[3], train_avg_vecs[3][j], &train_vid_info_ptr[j]);
-					}
-				}
-			}
-#pragma omp section
-			{
-#pragma omp parallel num_threads(LOOP_THREAD_NUM)
-				{
-#pragma omp for schedule(dynamic)
-					for (int j = 0; j < train_num; j++){
-						insert_vec(nest_builders_ptr[4], train_avg_vecs[4][j], &train_vid_info_ptr[j]);
-					}
-				}
-			}
-#pragma omp section
-			{
-#pragma omp parallel num_threads(LOOP_THREAD_NUM)
-				{
-#pragma omp for schedule(dynamic)
-					for (int j = 0; j < train_num; j++){
-						insert_vec(nest_builders_ptr[5], train_avg_vecs[5][j], &train_vid_info_ptr[j]);
-					}
-				}
-			}
-#pragma omp section
-			{
-#pragma omp parallel num_threads(LOOP_THREAD_NUM)
-				{
-#pragma omp for schedule(dynamic)
-					for (int j = 0; j < train_num; j++){
-						insert_vec(nest_builders_ptr[6], train_avg_vecs[6][j], &train_vid_info_ptr[j]);
-					}
-				}
-			}
-		}
-	}*/
 	gettimeofday(&end, NULL);
 	insertion = 1000000*(end.tv_sec-start.tv_sec)+(end.tv_usec-start.tv_usec);
 
@@ -219,6 +140,10 @@ int pre_proc(char* train_vid_frame_folder, char* train_vid_info_file, char* quer
 		read_feature_vectors(i, query_vid_frame_folder, query_avg_vecs[i], query_num, query_dim);
 	}*/
 
+	/// Report the feature vectors
+	//report_avg_vecs(train_avg_vecs, train_num);
+	//report_avg_vecs(query_avg_vecs, query_num);
+
 	/// Release allocated Memory
 	for (int i = 0; i < train_num; i++){
 		free(train_vid_ptr[i]);
@@ -245,7 +170,7 @@ int pre_proc(char* train_vid_frame_folder, char* train_vid_info_file, char* quer
 	train_avg_vecs = NULL;
 
 	printf("The time cost of computing feature vectors of the training set is %lf, of computing those of the query set is: %lf, of insertion into NEST is %lf\n"\
-				, comp_train_set/1000000, comp_query_set/1000000, insertion/1000000);
+					, comp_train_set/1000000, comp_query_set/1000000, insertion/1000000);
 
 	return 0;
 }
@@ -253,8 +178,6 @@ int pre_proc(char* train_vid_frame_folder, char* train_vid_info_file, char* quer
 /* Emit queries to NEST tables, and record results to file system */
 int emit_queries(char* query_vid_frame_folder, NestBuilder** nest_builders_ptr, float*** query_avg_vecs, int query_num)
 {
-	omp_set_nested(1);
-
 	float*** query_results_all = NULL;
 	query_results_all = (float***) malloc(sizeof(float**)*FEATURENUM);
 	if(NULL == query_results_all){
@@ -267,42 +190,8 @@ int emit_queries(char* query_vid_frame_folder, NestBuilder** nest_builders_ptr, 
 	double resp_time;
 
 	gettimeofday(&start, NULL);
-/*	for (int i = 0; i < FEATURENUM; i++){
+	for (int i = 0; i < FEATURENUM; i++){
 		(*alg_ann)(nest_builders_ptr[i], query_avg_vecs[i], query_num, classes, CLASSNUM, query_results_all[i], vector_lens[i]);
-	}*/
-#pragma omp parallel num_threads(COM_THREAD_NUM)
-	{
-#pragma omp sections
-		{
-#pragma omp section
-			{
-				(*alg_ann)(nest_builders_ptr[0], query_avg_vecs[0], query_num, classes, CLASSNUM, query_results_all[0], vector_lens[0]);
-			}
-#pragma omp section
-			{
-				(*alg_ann)(nest_builders_ptr[1], query_avg_vecs[1], query_num, classes, CLASSNUM, query_results_all[1], vector_lens[1]);
-			}
-#pragma omp section
-			{
-				(*alg_ann)(nest_builders_ptr[2], query_avg_vecs[2], query_num, classes, CLASSNUM, query_results_all[2], vector_lens[2]);
-			}
-#pragma omp section
-			{
-				(*alg_ann)(nest_builders_ptr[3], query_avg_vecs[3], query_num, classes, CLASSNUM, query_results_all[3], vector_lens[3]);
-			}
-#pragma omp section
-			{
-				(*alg_ann)(nest_builders_ptr[4], query_avg_vecs[4], query_num, classes, CLASSNUM, query_results_all[4], vector_lens[4]);
-			}
-#pragma omp section
-			{
-				(*alg_ann)(nest_builders_ptr[5], query_avg_vecs[5], query_num, classes, CLASSNUM, query_results_all[5], vector_lens[5]);
-			}
-#pragma omp section
-			{
-				(*alg_ann)(nest_builders_ptr[6], query_avg_vecs[6], query_num, classes, CLASSNUM, query_results_all[6], vector_lens[6]);
-			}
-		}
 	}
 	gettimeofday(&end, NULL);
 	resp_time = 1000000*(end.tv_sec-start.tv_sec)+(end.tv_usec-start.tv_usec);

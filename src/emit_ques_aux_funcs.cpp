@@ -18,17 +18,16 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <libgen.h>
-#include <omp.h>
 #include "emit_ques_aux_funcs.h"
 
 using namespace std;
 using namespace cv;
 
-char *func_name_array[] = {"hsv_color_dist", "color_coherence_dist", "spatial_pattern_dist", "edge_orient_dist"\
+char *func_name_array[] = {"hsv_color_dist", "color_coherence", "spatial_pattern_dist", "edge_orient_dist"\
 		, "bounding_box_dist", "texture_dist", "optical_flow_dist"};
 char *suffix_array[] = {"_vectors.txt", "_labels.txt"};
-char feature_vector_folder[] = "/home/yixin/workspace/Hist_Nest_parallel/Vector_files/";
-char label_vector_folder[] = "/home/yixin/workspace/Hist_Nest_parallel/Label_files/";
+char feature_vector_folder[] = "/home/yixin/workspace/Hist_Nest_new/Vector_files/";
+char label_vector_folder[] = "/home/yixin/workspace/Hist_Nest_new/Label_files/";
 char* classes[CLASSNUM] = {"E", "S", "V", "M", "L", "X", "-1"};
 
 int alg_ann(NestBuilder*, float**, int, char* [], int, float** &, int);
@@ -40,8 +39,6 @@ int read_feature_vectors(int, char*, float** &, int &, int &);
 /* The learning algorithm of weak learners, ANN */
 int alg_ann(NestBuilder* nest_builder_ptr, float** hist_array_ptr, int lines, char* classes[], int classes_num, float** &result, int dimension)
 {
-	omp_set_nested(1);
-
 	/// Initialize the return value of ANN
 	result = NULL;
 	result = (float**) malloc(sizeof(float*)*lines);
@@ -64,35 +61,31 @@ int alg_ann(NestBuilder* nest_builder_ptr, float** hist_array_ptr, int lines, ch
 	}
 
 	/// Compute the possibilities of a query belonging to each label
-#pragma omp parallel num_threads(LOOP_THREAD_NUM)
-	{
-#pragma omp for schedule(dynamic)
-		for (int i = 0; i < lines; i++){
-			if (NULL == hist_array_ptr[i]){
-				continue;
-			}
-
-			NNResult* res = nest_builder_ptr->nestGetNN(hist_array_ptr[i]);
-			int zero_counter = 0;
-			for (int j = 0; j < classes_num; j++){
-				for (int k = 0; k < res->num; k++){
-					if (*((unsigned**) res->info)[k] == j){
-						result[i][j] += 1;
-					}
-					else{
-						zero_counter++;
-					}
-				}
-				if (res->num != 0){
-					result[i][j] /= res->num;
-				}
-			}
-			/// Set the query as X
-			if (zero_counter == res->num*classes_num){
-				result[i][5] = 1.0;
-			}
-			nest_builder_ptr->freeNNResult(res);
+	for (int i = 0; i < lines; i++){
+		if (NULL == hist_array_ptr[i]){
+			continue;
 		}
+
+		NNResult* res = nest_builder_ptr->nestGetNN(hist_array_ptr[i]);
+		int zero_counter = 0;
+		for (int j = 0; j < classes_num; j++){
+			for (int k = 0; k < res->num; k++){
+				if (*((unsigned**) res->info)[k] == j){
+					result[i][j] += 1;
+				}
+				else{
+					zero_counter++;
+				}
+			}
+			if (res->num != 0){
+				result[i][j] /= res->num;
+			}
+		}
+		/// Set the query as X
+		if (zero_counter == res->num*classes_num){
+			result[i][5] = 1.0;
+		}
+		nest_builder_ptr->freeNNResult(res);
 	}
 
 	return 0;
