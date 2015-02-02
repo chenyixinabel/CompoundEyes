@@ -29,12 +29,5 @@ int avg_vecs_comp(char**, int, float*** &);
 /* Insert a feature vector into a NEST table */
 //int insert_vec(NestBuilder*, float*, Vid_info);
 int insert_vec(NestBuilder*, float*, unsigned*);
-/* Print the feature vectors on the screen */
-int report_avg_vecs(float***, int);
-
-int load_imgs(char*, vector<Mat> &, int &);
-int gen_hists_comp(int (*hist_function)(Mat, Mat&), vector<Mat>, int, vector<Mat> &);
-int optical_flow_hists_comp(int (*hist_function)(Mat, Mat, Mat&), vector<Mat>, int, vector<Mat> &);
-int avg_hist_comp(vector<Mat> hists, int hist_num, float* &avg_arr);
 
 #endif  PRE_PROC_AUX_FUNCS_H_

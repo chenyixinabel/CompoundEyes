@@ -17,15 +17,24 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <sys/time.h>
 #include <libgen.h>
 #include <vector>
+#include <omp.h>
 #include "pre_proc_aux_funcs.h"
 
 using namespace std;
 using namespace cv;
 
-char conf_file[] = "/home/yixin/workspace/Hist_Nest_new/src/Nest/nest.conf";
+extern int com_thread_num;
+extern int hsv_loop_thread_num;
+extern int cc_loop_thread_num;
+extern int sp_loop_thread_num;
+extern int eo_loop_thread_num;
+extern int bb_loop_thread_num;
+extern int tex_loop_thread_num;
+extern int opt_loop_thread_num;
+
+char conf_file[] = "/home/yixin/workspace/Hist_Nest_parallel_thd_num/src/Nest/nest.conf";
 int vector_lens[] = {HUESIZE+SATSIZE+VALSIZE, NUM_CCV_COLOR, PATTERNCOUNT, EDGEHISTSIZE, WIDTHHISTSIZE+HEIGHTHISTSIZE\
 , LBPBINCOUNT, OPFLOWHISTSIZE};
 float ranges[] = {0.05, 0.02, 0.05, 0.03, 0.04, 0.05, 0.06};
@@ -40,7 +49,6 @@ int gen_hists_comp(int (*hist_function)(Mat, Mat&), vector<Mat>, int, vector<Mat
 int optical_flow_hists_comp(int (*hist_function)(Mat, Mat, Mat&), vector<Mat>, int, vector<Mat> &);
 int avg_hist_comp(vector<Mat>, int, float*&);
 int insert_vec(NestBuilder*, float*, unsigned*);
-int report_avg_vecs(float***, int);
 
 /* Load names of directories into dirs */
 int load_dirs(char* vid_frame_folder, char* vid_info_file, char** &dirs, unsigned* &vid_info, int &lines)
@@ -245,15 +253,8 @@ int avg_vecs_comp(char** vid_ptr, int vid_count, float*** &avg_vecs)
 {
 	vector<Mat> imgs;
 	int frame_count;
-	struct timeval start, end;
-	double hsv_hist_comp_time = 0;
-	double cc_hist_comp_time = 0;
-	double sp_hist_comp_time = 0;
-	double eo_hist_comp_time = 0;
-	double bb_hist_comp_time = 0;
-	double tex_hist_comp_time = 0;
-	double of_hist_comp_time = 0;
-	double other_time = 0;
+
+	omp_set_nested(1);
 
 	/// Allocate Memory for avg_vecs
 	avg_vecs = NULL;
@@ -271,71 +272,64 @@ int avg_vecs_comp(char** vid_ptr, int vid_count, float*** &avg_vecs)
 		}
 	}
 
+
 	for (int i = 0; i < vid_count; i++){
-		gettimeofday(&start, NULL);
 		imgs.clear();
 		frame_count = 0;
 
 		// Load frames of a video into imgs
 		load_imgs(vid_ptr[i], imgs, frame_count);
-		gettimeofday(&end, NULL);
-		other_time += 1000000*(end.tv_sec-start.tv_sec)+(end.tv_usec-start.tv_usec);
 
 		// Compute vectors, could work in parallel
-		gettimeofday(&start, NULL);
-		vector<Mat> hsv_hists(frame_count);
-		gen_hists_comp(&hsv_color_dist, imgs, frame_count, hsv_hists);
-		avg_hist_comp(hsv_hists, frame_count, avg_vecs[0][i]);// Compute average vectors
-		gettimeofday(&end, NULL);
-		hsv_hist_comp_time += 1000000*(end.tv_sec-start.tv_sec)+(end.tv_usec-start.tv_usec);
-
-		gettimeofday(&start, NULL);
-		vector<Mat> cc_hists(frame_count);
-		gen_hists_comp(&color_coherence_dist, imgs, frame_count, cc_hists);
-		avg_hist_comp(cc_hists, frame_count, avg_vecs[1][i]);// Compute average vectors
-		gettimeofday(&end, NULL);
-		cc_hist_comp_time += 1000000*(end.tv_sec-start.tv_sec)+(end.tv_usec-start.tv_usec);
-
-		gettimeofday(&start, NULL);
-		vector<Mat> sp_hists(frame_count);
-		gen_hists_comp(&spatial_pattern_dist, imgs, frame_count, sp_hists);
-		avg_hist_comp(sp_hists, frame_count, avg_vecs[2][i]);// Compute average vectors
-		gettimeofday(&end, NULL);
-		sp_hist_comp_time += 1000000*(end.tv_sec-start.tv_sec)+(end.tv_usec-start.tv_usec);
-
-		gettimeofday(&start, NULL);
-		vector<Mat> eo_hists(frame_count);
-		gen_hists_comp(&edge_orient_dist, imgs, frame_count, eo_hists);
-		avg_hist_comp(eo_hists, frame_count, avg_vecs[3][i]);// Compute average vectors
-		gettimeofday(&end, NULL);
-		eo_hist_comp_time += 1000000*(end.tv_sec-start.tv_sec)+(end.tv_usec-start.tv_usec);
-
-		gettimeofday(&start, NULL);
-		vector<Mat> bb_hists(frame_count);
-		gen_hists_comp(&bounding_box_dist, imgs, frame_count, bb_hists);
-		avg_hist_comp(bb_hists, frame_count, avg_vecs[4][i]);// Compute average vectors
-		gettimeofday(&end, NULL);
-		bb_hist_comp_time += 1000000*(end.tv_sec-start.tv_sec)+(end.tv_usec-start.tv_usec);
-
-		gettimeofday(&start, NULL);
-		vector<Mat> tex_hists(frame_count);
-		gen_hists_comp(&texture_dist, imgs, frame_count, tex_hists);
-		avg_hist_comp(tex_hists, frame_count, avg_vecs[5][i]);// Compute average vectors
-		gettimeofday(&end, NULL);
-		tex_hist_comp_time += 1000000*(end.tv_sec-start.tv_sec)+(end.tv_usec-start.tv_usec);
-
-		gettimeofday(&start, NULL);
-		vector<Mat> of_hists(frame_count-1);
-		optical_flow_hists_comp(&optical_flow_dist, imgs, frame_count, of_hists);
-		avg_hist_comp(of_hists, frame_count-1, avg_vecs[6][i]);// Compute average vectors
-		gettimeofday(&end, NULL);
-		of_hist_comp_time += 1000000*(end.tv_sec-start.tv_sec)+(end.tv_usec-start.tv_usec);
+#pragma omp parallel num_threads(com_thread_num)
+		{
+#pragma omp sections
+			{
+#pragma omp section
+				{
+					vector<Mat> hsv_hists(frame_count);
+					gen_hists_comp(&hsv_color_dist, imgs, frame_count, hsv_hists);
+					avg_hist_comp(hsv_hists, frame_count, avg_vecs[0][i]);
+				}
+#pragma omp section
+				{
+					vector<Mat> cc_hists(frame_count);
+					gen_hists_comp(&color_coherence_dist, imgs, frame_count, cc_hists);
+					avg_hist_comp(cc_hists, frame_count, avg_vecs[1][i]);
+				}
+#pragma omp section
+				{
+					vector<Mat> sp_hists(frame_count);
+					gen_hists_comp(&spatial_pattern_dist, imgs, frame_count, sp_hists);
+					avg_hist_comp(sp_hists, frame_count, avg_vecs[2][i]);
+				}
+#pragma omp section
+				{
+					vector<Mat> eo_hists(frame_count);
+					gen_hists_comp(&edge_orient_dist, imgs, frame_count, eo_hists);
+					avg_hist_comp(eo_hists, frame_count, avg_vecs[3][i]);
+				}
+#pragma omp section
+				{
+					vector<Mat> bb_hists(frame_count);
+					gen_hists_comp(&bounding_box_dist, imgs, frame_count, bb_hists);
+					avg_hist_comp(bb_hists, frame_count, avg_vecs[4][i]);
+				}
+#pragma omp section
+				{
+					vector<Mat> tex_hists(frame_count);
+					gen_hists_comp(&texture_dist, imgs, frame_count, tex_hists);
+					avg_hist_comp(tex_hists, frame_count, avg_vecs[5][i]);
+				}
+#pragma omp section
+				{
+					vector<Mat> of_hists(frame_count-1);
+					optical_flow_hists_comp(&optical_flow_dist, imgs, frame_count, of_hists);
+					avg_hist_comp(of_hists, frame_count-1, avg_vecs[6][i]);
+				}
+			}
+		}
 	}
-
-	printf("hist compute time of hsv is %lf, of cc is %lf, of sp is %lf, of eo is %lf, of bb is %lf, of tex is %lf, of of is %lf\n"\
-			, (hsv_hist_comp_time+other_time)/1000000, (cc_hist_comp_time+other_time)/1000000, (sp_hist_comp_time+other_time)/1000000\
-			, (eo_hist_comp_time+other_time)/1000000, (bb_hist_comp_time+other_time)/1000000, (tex_hist_comp_time+other_time)/1000000\
-			, (of_hist_comp_time+other_time)/1000000);
 
 	return 0;
 }
@@ -387,8 +381,32 @@ int load_imgs(char* folder, vector<Mat> &imgs, int &frame_count)
 /* Compute histograms from a video, using algorithm need only one frame each time */
 int gen_hists_comp(int (*hist_function)(Mat, Mat&), vector<Mat> imgs, int frame_count, vector<Mat> &hists)
 {
-	for (int i = 0; i < frame_count; i++){
-		(*hist_function)(imgs[i], hists[i]);
+	int thread_num = -1;
+	if (hist_function == &hsv_color_dist){
+		thread_num = hsv_loop_thread_num;
+	}
+	else if (hist_function == &color_coherence_dist){
+		thread_num = cc_loop_thread_num;
+	}
+	else if (hist_function == &spatial_pattern_dist){
+		thread_num = sp_loop_thread_num;
+	}
+	else if (hist_function == &edge_orient_dist){
+		thread_num = eo_loop_thread_num;
+	}
+	else if (hist_function == &bounding_box_dist){
+		thread_num = bb_loop_thread_num;
+	}
+	else if (hist_function == &texture_dist){
+		thread_num = tex_loop_thread_num;
+	}
+
+#pragma omp parallel num_threads(thread_num)
+	{
+#pragma omp for schedule(dynamic)
+		for (int i = 0; i < frame_count; i++){
+			(*hist_function)(imgs[i], hists[i]);
+		}
 	}
 
 	return 0;
@@ -397,8 +415,12 @@ int gen_hists_comp(int (*hist_function)(Mat, Mat&), vector<Mat> imgs, int frame_
 /* Computer histograms from a video, using the optical flow algorithm */
 int optical_flow_hists_comp(int (*hist_function)(Mat, Mat, Mat&), vector<Mat> imgs, int frame_count, vector<Mat> &hists)
 {
-	for (int i = 0; i < frame_count-1; i++){
-		(*hist_function)(imgs[i],imgs[i+1],hists[i]);
+#pragma omp parallel num_threads(opt_loop_thread_num)
+	{
+#pragma omp for schedule(dynamic)
+		for (int i = 0; i < frame_count-1; i++){
+			(*hist_function)(imgs[i],imgs[i+1],hists[i]);
+		}
 	}
 	return 0;
 }
@@ -430,7 +452,7 @@ int avg_hist_comp(vector<Mat> hists, int hist_num, float* &avg_arr)
 	}
 	for (int i = 0; i < avg_hist.rows; i++){
 		//avg_vector[i] = avg_hist.at<float>(i,1)*MULFACTOR;
-		avg_arr[i] = avg_vec[i]*MULFACTOR;
+		avg_arr[i] = avg_vec[i];
 	}
 
 	return 0;
@@ -447,21 +469,5 @@ int insert_vec(NestBuilder* nest_builder_ptr, float* hist_array_ptr, unsigned* v
 		}
 	}
 
-	return 0;
-}
-
-/* Print the feature vectors on the screen */
-int report_avg_vecs(float*** avg_vecs, int num)
-{
-	for (int i = 0; i < FEATURENUM; i++){
-		printf("Feature vectors of feature %d:\n", i);
-		for (int j = 0; j < num; j++){
-			for (int k = 0; k < vector_lens[i]; k++){
-				printf("%.4f ", avg_vecs[i][j][k]);
-			}
-			printf("\n");
-		}
-		printf("\n");
-	}
 	return 0;
 }
