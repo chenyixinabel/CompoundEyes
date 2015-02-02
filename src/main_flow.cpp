@@ -270,14 +270,14 @@ int emit_queries(char* query_vid_frame_folder, NestBuilder** nest_builders_ptr, 
 /*	for (int i = 0; i < FEATURENUM; i++){
 		(*alg_ann)(nest_builders_ptr[i], query_avg_vecs[i], query_num, classes, CLASSNUM, query_results_all[i], vector_lens[i]);
 	}*/
-#pragma omp parallel num_threads(COM_THREAD_NUM)
+/*#pragma omp parallel num_threads(COM_THREAD_NUM)
 	{
 #pragma omp sections
 		{
 #pragma omp section
-			{
-				(*alg_ann)(nest_builders_ptr[0], query_avg_vecs[0], query_num, classes, CLASSNUM, query_results_all[0], vector_lens[0]);
-			}
+			{*/
+	(*alg_ann)(nest_builders_ptr[0], query_avg_vecs[0], query_num, classes, CLASSNUM, query_results_all[0], vector_lens[0]);
+			/*}
 #pragma omp section
 			{
 				(*alg_ann)(nest_builders_ptr[1], query_avg_vecs[1], query_num, classes, CLASSNUM, query_results_all[1], vector_lens[1]);
@@ -303,7 +303,7 @@ int emit_queries(char* query_vid_frame_folder, NestBuilder** nest_builders_ptr, 
 				(*alg_ann)(nest_builders_ptr[6], query_avg_vecs[6], query_num, classes, CLASSNUM, query_results_all[6], vector_lens[6]);
 			}
 		}
-	}
+	}*/
 	gettimeofday(&end, NULL);
 	resp_time = 1000000*(end.tv_sec-start.tv_sec)+(end.tv_usec-start.tv_usec);
 
