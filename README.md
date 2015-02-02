@@ -13,5 +13,5 @@ This repository contains 11 branches, each of which is aimed at evaluating Compo
 7. test-4-best-fexts: CompoundEyes with the combination of four feature extractors having the best accuracy when four extractors are allowed.
 8. test-5-best-fexts: CompoundEyes with the combination of five feature extractors having the best accuracy when five extractors are allowed.
 9. test-6-best-fexts: CompoundEyes with the combination of six feature extractors having the best accuracy when six extractors are allowed.
-10. test-r-k:
-11. test-thread-num:
+10. test-r-k: CompoundEyes of the parallel version with parameters r and k varied.
+11. test-thread-num: CompoundEyes of the parallel version with the number of thread created varied.
