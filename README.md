@@ -47,3 +47,10 @@ Having been configured, build the project by Project -> Build All or Project -> 
 1. ~cd ./Debug
 2. ~make
 
+## Running the program
+
+In the Eclipse IDE, such configurations are necessary for running the program:
+
+1. Create a new entry in Run -> Run Configurations -> C/C++ Application
+2. In Main -> C/C++ Application: entering <the location of the executable of the project>, e.g., Debug/Hist\_Nest\_parallel.
+3. In 
