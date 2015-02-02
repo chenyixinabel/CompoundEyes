@@ -11,3 +11,5 @@ This repository contains 11 branches, each of which is aimed at evaluating Compo
 7. test-4-best-fexts:
 8. test-5-best-fexts:
 9. test-6-best-fexts:
+10. test-r-k:
+11. test-thread-num:
