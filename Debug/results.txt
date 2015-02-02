@@ -1,0 +1,86 @@
+r = 0.04
+w = 5.00
+k = 4
+l = 4
+size = 250000
+offset = 100
+dimension = 24
+max_steps = 500
+p = 0.1000
+lsh_type = E2LSH
+optimize off
+
+r = 0.00
+w = 5.00
+k = 4
+l = 4
+size = 250000
+offset = 100
+dimension = 64
+max_steps = 500
+p = 0.1000
+lsh_type = E2LSH
+optimize off
+
+r = 0.04
+w = 5.00
+k = 4
+l = 4
+size = 250000
+offset = 100
+dimension = 24
+max_steps = 500
+p = 0.1000
+lsh_type = E2LSH
+optimize off
+
+r = 0.01
+w = 5.00
+k = 4
+l = 4
+size = 250000
+offset = 100
+dimension = 16
+max_steps = 500
+p = 0.1000
+lsh_type = E2LSH
+optimize off
+
+r = 0.03
+w = 5.00
+k = 4
+l = 4
+size = 250000
+offset = 100
+dimension = 32
+max_steps = 500
+p = 0.1000
+lsh_type = E2LSH
+optimize off
+
+r = 0.04
+w = 5.00
+k = 4
+l = 4
+size = 250000
+offset = 100
+dimension = 16
+max_steps = 500
+p = 0.1000
+lsh_type = E2LSH
+optimize off
+
+r = 0.05
+w = 5.00
+k = 4
+l = 4
+size = 250000
+offset = 100
+dimension = 16
+max_steps = 500
+p = 0.1000
+lsh_type = E2LSH
+optimize off
+
+The time cost of computing feature vectors of the training set is 51.124415, of computing those of the query set is: 73.499454, of insertion into NEST is 0.001004
+The response time is 0.002659

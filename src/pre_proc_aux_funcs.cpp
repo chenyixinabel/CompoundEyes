@@ -25,7 +25,7 @@
 using namespace std;
 using namespace cv;
 
-char conf_file[] = "/home/yixin/workspace/Hist_Nest_parallel/src/Nest/nest.conf";
+char conf_file[] = "/home/yixin/workspace/Hist_Nest_parallel_r_k/src/Nest/nest.conf";
 int vector_lens[] = {HUESIZE+SATSIZE+VALSIZE, NUM_CCV_COLOR, PATTERNCOUNT, EDGEHISTSIZE, WIDTHHISTSIZE+HEIGHTHISTSIZE\
 , LBPBINCOUNT, OPFLOWHISTSIZE};
 float ranges[] = {0.05, 0.02, 0.05, 0.03, 0.04, 0.05, 0.06};

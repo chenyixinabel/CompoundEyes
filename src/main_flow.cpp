@@ -331,6 +331,14 @@ int emit_queries(char* query_vid_frame_folder, NestBuilder** nest_builders_ptr, 
 
 int main(int argc, char* argv[])
 {
+	float offset_r = atof(argv[5]);
+	int offset_k = atoi(argv[6]);
+
+	for (int i = 0; i < FEATURENUM; i++){
+		ranges[i] += offset_r;
+		lsh_func_nums[i] += offset_k;
+	}
+
 	proc_flow(argv[1], argv[2], argv[3], argv[4]);
 	return 0;
 }
