@@ -282,7 +282,7 @@ int emit_queries(char* query_vid_frame_folder, NestBuilder** nest_builders_ptr, 
 			{
 				(*alg_ann)(nest_builders_ptr[1], query_avg_vecs[1], query_num, classes, CLASSNUM, query_results_all[1], vector_lens[1]);
 			}
-#pragma omp section
+/*#pragma omp section
 			{
 				(*alg_ann)(nest_builders_ptr[2], query_avg_vecs[2], query_num, classes, CLASSNUM, query_results_all[2], vector_lens[2]);
 			}
@@ -301,7 +301,7 @@ int emit_queries(char* query_vid_frame_folder, NestBuilder** nest_builders_ptr, 
 #pragma omp section
 			{
 				(*alg_ann)(nest_builders_ptr[6], query_avg_vecs[6], query_num, classes, CLASSNUM, query_results_all[6], vector_lens[6]);
-			}
+			}*/
 		}
 	}
 	gettimeofday(&end, NULL);

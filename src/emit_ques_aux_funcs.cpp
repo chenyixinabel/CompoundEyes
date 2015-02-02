@@ -24,11 +24,10 @@
 using namespace std;
 using namespace cv;
 
-char *func_name_array[] = {"hsv_color_dist", "color_coherence_dist", "spatial_pattern_dist", "edge_orient_dist"\
-		, "bounding_box_dist", "texture_dist", "optical_flow_dist"};
+char *func_name_array[] = {"hsv_color_dist", "color_coherence_dist"};
 char *suffix_array[] = {"_vectors.txt", "_labels.txt"};
-char feature_vector_folder[] = "/home/yixin/workspace/Hist_Nest_parallel/Vector_files/";
-char label_vector_folder[] = "/home/yixin/workspace/Hist_Nest_parallel/Label_files/";
+char feature_vector_folder[] = "/home/yixin/workspace/Hist_Nest_parallel_2/Vector_files/";
+char label_vector_folder[] = "/home/yixin/workspace/Hist_Nest_parallel_2/Label_files/";
 char* classes[CLASSNUM] = {"E", "S", "V", "M", "L", "X", "-1"};
 
 int alg_ann(NestBuilder*, float**, int, char* [], int, float** &, int);
