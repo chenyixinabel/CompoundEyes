@@ -11,8 +11,6 @@ This combination also has been proved to have the highest accuracy in all the co
 
 All the feature computations are parallelized in this branch.
 
-These feature extractors run in parallel, whose computations of features could also take up one or more threads.
-
 ## Build the project
 
 To build the project, the first thing to do is to install OpenCV on the computer, which could be as easy as entering:
