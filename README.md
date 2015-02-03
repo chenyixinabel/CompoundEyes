@@ -40,6 +40,7 @@ In the Eclipse IDE, such configurations are necessary for running the program:
 2. In Main -> C/C++ Application: entering (the location of the executable of the project), e.g., Debug/Hist\_Nest\_parallel\_6.
 3. In Arguments -> Program arguments: entering (the location of the training video set) (the location of the groundtruth file of the training videos) (the location of the testing video set) (the location of the groundtruth file of the testing videos), each argument occupies the whole line.
 4. Before running the program, make sure that all the .conf files in ./src/Nest except nest.conf have already been deleted, otherwise, new configurations will not have effect on the program.
+5. Note that once the project has been downloaded to your computer for the first time, or moved to another machine, conf\_file in pre\_proc\_aux\_funcs.cpp, feature\_vector\_folder and label\_vector\_folder in emit\_ques\_aux\_funcs.cpp should be changed accordingly to your directory hierarchy, then the project should be re-compiled.
 
 An example for step 3 is:
 
