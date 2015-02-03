@@ -35,7 +35,7 @@ Having been configured, build the project by Project -> Build All or Project -> 
 In the Eclipse IDE, such configurations are necessary for running the program:
 
 1. Create a new entry in Run -> Run Configurations -> C/C++ Application
-2. In Main -> C/C++ Application: entering (the location of the executable of the project), e.g., Debug/Hist\_Nest\_parallel.
+2. In Main -> C/C++ Application: entering (the location of the executable of the project), e.g., Debug/Hist\_Nest\_parallel\_2\_1.
 3. In Arguments -> Program arguments: entering (the location of the training video set) (the location of the groundtruth file of the training videos) (the location of the testing video set) (the location of the groundtruth file of the testing videos), each argument occupies the whole line.
 4. Before running the program, make sure that all the .conf files in ./src/Nest except nest.conf have already been deleted, otherwise, new configurations will not have effect on the program.
 
