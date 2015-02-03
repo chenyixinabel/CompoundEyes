@@ -10,6 +10,8 @@ Three feature extractors are combined to conduct near-duplicate video detection 
 
 This combination has been proved to have the highest accuracy in all the combinations of three feature extractors.
 
+All the feature computations are running in parallel in this branch.
+
 ## Build the project
 
 To build the project, the first thing to do is to install OpenCV on the computer, which could be as easy as entering:
