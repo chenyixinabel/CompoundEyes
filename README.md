@@ -62,3 +62,5 @@ In the Eclipse IDE, such configurations are necessary for running the program:
 /home/yixin/dataset/Test_s_0.1_p_0.5/Test_v1/1_test/
 
 /home/yixin/dataset/Test_s_0.1_p_0.5/Test_v1/groundtruth/GT_new_1_test.txt.
+
+4. Before running the program, make sure that all the .conf files in ./src/Nest except nest.conf have already been deleted, otherwise, new configurations will not have effect on the program.
