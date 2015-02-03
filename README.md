@@ -8,9 +8,8 @@ Two feature extractors are involved in this branch to conduct near-duplicate vid
 2. Color coherence.
 
 The combination of these two has been proved to have the highest accuracy in all the combinations of two extractors.
-As the master branch, feature computations in this branch are parallelized.
 
-These feature extractors run in parallel, whose computations of features could also take up one or more threads.
+As the master branch, feature computations in this branch are parallelized.
 
 ## Build the project
 
